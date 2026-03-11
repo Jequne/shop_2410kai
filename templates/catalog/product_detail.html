@@ -5,51 +5,94 @@
 {% block content %}
 <div class="row g-4">
     <div class="col-md-6">
-        {% if product.image %}
-        <img src="{{ product.image.url }}" class="img-fluid rounded-4 shadow-sm" alt="{{ product.name }}">
-        {% endif %}
+        <div class="product-detail-media-wrap">
+            {% if product.image %}
+            <img src="{{ product.image.url }}" class="img-fluid rounded-4 shadow-sm product-detail-main-image"
+                alt="{{ product.name }}">
+            {% else %}
+            <div class="product-detail-main-image product-thumb-placeholder">Нет фото</div>
+            {% endif %}
+        </div>
     </div>
     <div class="col-md-6">
-        <h1 class="h2">{{ product.name }}</h1>
-        <p class="text-muted">{{ product.category.name|default:'Без категории' }}</p>
-        <p>{{ product.description }}</p>
-        <p class="h4">{{ product.price }} руб.</p>
-        {% if product.stock_quantity > 0 %}
-        <p class="{% if product.stock_quantity < 10 %}stock-low{% else %}text-success{% endif %}">
-            В наличии: {{ product.stock_quantity }} шт.
-        </p>
-        {% else %}
-        <p class="text-danger">Нет в наличии</p>
-        {% endif %}
-        <p>Средняя оценка: {{ product.average_rating }}</p>
+        <div class="product-buy-panel card card-body shadow-sm">
+            <p class="product-detail-category mb-2">{{ product.category.name|default:'Без категории' }}</p>
+            <h1 class="h2 mb-2">{{ product.name }}</h1>
+            <p class="mb-3">{{ product.description }}</p>
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
+                <p class="h4 mb-0">{{ product.price }} руб.</p>
+                <span class="product-rating-chip">Средняя оценка: {{ product.average_rating }}</span>
+            </div>
 
-        {% if request.user.is_authenticated %}
-        <form method="post" action="{% url 'cart:add' product.slug %}" hx-post="{% url 'cart:add' product.slug %}"
-            hx-swap="none">
-            {% csrf_token %}
-            <button class="btn btn-dark" type="submit">Добавить в корзину</button>
-        </form>
-        {% else %}
-        <a class="btn btn-dark" href="{% url 'accounts:login' %}">Войдите, чтобы добавить в корзину</a>
-        {% endif %}
+            {% if product.stock_quantity > 0 %}
+            <p class="mb-3 {% if product.stock_quantity < 10 %}stock-low{% else %}text-success{% endif %}">
+                В наличии: {{ product.stock_quantity }} шт.
+            </p>
+            {% else %}
+            <p class="text-danger mb-3">Нет в наличии</p>
+            {% endif %}
+
+            {% if request.user.is_authenticated %}
+            <div class="d-flex flex-column gap-2">
+                <form method="post" action="{% url 'cart:add' product.slug %}"
+                    hx-post="{% url 'cart:add' product.slug %}" hx-swap="none">
+                    {% csrf_token %}
+                    <button class="btn btn-dark w-100" type="submit">Добавить в корзину</button>
+                </form>
+
+                {% if cart_item %}
+                <div class="product-inline-cart-controls">
+                    <form method="post" action="{% url 'cart:decrease_item' cart_item.id %}"
+                        hx-post="{% url 'cart:decrease_item' cart_item.id %}" hx-swap="none">
+                        {% csrf_token %}
+                        <button class="btn btn-outline-dark btn-sm" type="submit">-</button>
+                    </form>
+                    <span class="product-inline-cart-qty">В корзине: {{ cart_item.quantity }}</span>
+                    <form method="post" action="{% url 'cart:increase_item' cart_item.id %}"
+                        hx-post="{% url 'cart:increase_item' cart_item.id %}" hx-swap="none">
+                        {% csrf_token %}
+                        <button class="btn btn-outline-dark btn-sm" type="submit">+</button>
+                    </form>
+                    <form method="post" action="{% url 'cart:remove_item' cart_item.id %}"
+                        hx-post="{% url 'cart:remove_item' cart_item.id %}" hx-swap="none">
+                        {% csrf_token %}
+                        <button class="btn btn-outline-danger btn-sm" type="submit">Убрать</button>
+                    </form>
+                </div>
+                {% endif %}
+            </div>
+            {% else %}
+            <a class="btn btn-dark" href="{% url 'accounts:login' %}">Войдите, чтобы добавить в корзину</a>
+            {% endif %}
+        </div>
     </div>
 </div>
 
 <hr class="my-4">
-<h2 class="h4">Отзывы</h2>
+<h2 class="h4 mb-3">Отзывы</h2>
 
 <div id="reviews-list">
     {% include 'catalog/partials/reviews_list.html' %}
 </div>
 
 {% if can_review %}
-<div class="card card-body mt-3 shadow-sm">
+<div class="card card-body mt-3 shadow-sm review-form-panel">
     <h3 class="h5">Оставить отзыв</h3>
     <form method="post" action="{% url 'catalog:add_review' product.slug %}"
         hx-post="{% url 'catalog:add_review' product.slug %}" hx-target="#reviews-list" hx-swap="innerHTML">
         {% csrf_token %}
-        {{ review_form.as_p }}
-        <button class="btn btn-dark" type="submit">Отправить</button>
+        <div class="mb-3">
+            <label class="form-label" for="{{ review_form.text.id_for_label }}">{{ review_form.text.label }}</label>
+            {{ review_form.text }}
+            {% if review_form.text.errors %}
+            <div class="text-danger small mt-1">{{ review_form.text.errors|striptags }}</div>
+            {% endif %}
+        </div>
+        <div class="mb-3 review-rating-row">
+            <label class="form-label" for="{{ review_form.rating.id_for_label }}">{{ review_form.rating.label }}</label>
+            {{ review_form.rating }}
+        </div>
+        <button class="btn btn-dark" type="submit">Отправить отзыв</button>
     </form>
 </div>
 {% elif request.user.is_authenticated %}

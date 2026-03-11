@@ -6,6 +6,7 @@ from django.db.models import Q
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 
+from cart.services import get_or_create_cart
 from catalog.forms import ProductReviewForm
 from catalog.models import Category, Product
 from orders.models import OrderItem
@@ -91,12 +92,17 @@ def product_detail_view(request: HttpRequest, slug: str) -> HttpResponse:
 
 	reviews = product.reviews.select_related('author').all()
 	form = ProductReviewForm()
+	cart_item = None
+	if request.user.is_authenticated:
+		cart = get_or_create_cart(request.user)
+		cart_item = cart.items.select_related('product').filter(product=product).first()
 
 	context = {
 		'product': product,
 		'reviews': reviews,
 		'review_form': form,
 		'can_review': _can_user_review_product(request.user, product),
+		'cart_item': cart_item,
 	}
 	return render(request, 'catalog/product_detail.html', context)
 

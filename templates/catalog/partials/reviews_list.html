@@ -1,12 +1,12 @@
 {% if reviews %}
 <div class="d-grid gap-3">
     {% for review in reviews %}
-    <div class="border rounded-3 p-3">
-        <div class="d-flex justify-content-between">
-            <strong>{{ review.author.username }}</strong>
-            <span>Оценка: {{ review.rating }}/5</span>
+    <div class="review-card border rounded-3 p-3">
+        <div class="d-flex justify-content-between align-items-center gap-2">
+            <strong class="review-author">{{ review.author.username }}</strong>
+            <span class="review-rating-badge">Оценка: {{ review.rating }}/5</span>
         </div>
-        <p class="mb-0 mt-2">{{ review.text }}</p>
+        <p class="mb-0 mt-2 review-text">{{ review.text }}</p>
     </div>
     {% endfor %}
 </div>

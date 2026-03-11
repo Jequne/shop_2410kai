@@ -25,6 +25,10 @@ def _render_cart_header_state(request, user):
 	return render(request, 'cart/partials/cart_header_state.html', context)
 
 
+def _is_cart_table_request(request: HttpRequest) -> bool:
+	return bool(request.htmx and request.headers.get('HX-Target') == 'cart-table-wrap')
+
+
 @login_required
 def cart_detail_view(request: HttpRequest) -> HttpResponse:
 	cart = get_or_create_cart(request.user)
@@ -61,8 +65,10 @@ def update_cart_item_view(request: HttpRequest, item_id: int) -> HttpResponse:
 		item.quantity = form.cleaned_data['quantity']
 		item.save(update_fields=['quantity'])
 
-	if request.htmx:
+	if _is_cart_table_request(request):
 		return render(request, 'cart/partials/cart_items_table.html', {'cart': item.cart, 'items': item.cart.items.select_related('product').all()})
+	if request.htmx:
+		return _render_cart_header_state(request, request.user)
 
 	return redirect('cart:detail')
 
@@ -73,8 +79,10 @@ def remove_cart_item_view(request: HttpRequest, item_id: int) -> HttpResponse:
 	cart = item.cart
 	item.delete()
 
-	if request.htmx:
+	if _is_cart_table_request(request):
 		return render(request, 'cart/partials/cart_items_table.html', {'cart': cart, 'items': cart.items.select_related('product').all()})
+	if request.htmx:
+		return _render_cart_header_state(request, request.user)
 
 	return redirect('cart:detail')
 
