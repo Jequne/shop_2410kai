@@ -11,7 +11,7 @@ from accounts.models import Profile
 
 
 class SignUpForm(UserCreationForm):
-    email = forms.EmailField(label='Email', required=True)
+    email = forms.EmailField(label='Почта', required=True)
 
     class Meta:
         model = User
@@ -22,6 +22,28 @@ class SignUpForm(UserCreationForm):
         if User.objects.filter(email__iexact=email).exists():
             raise ValidationError('Пользователь с таким email уже существует.')
         return email
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['email'].widget.attrs.update(
+            {
+                'class': 'form-control',
+                'placeholder': 'name@example.com',
+                'autocomplete': 'email',
+            }
+        )
+        self.fields['password1'].widget.attrs.update(
+            {
+                'class': 'form-control',
+                'autocomplete': 'new-password',
+            }
+        )
+        self.fields['password2'].widget.attrs.update(
+            {
+                'class': 'form-control',
+                'autocomplete': 'new-password',
+            }
+        )
 
     def save(self, commit=True):
         user = super().save(commit=False)
@@ -47,7 +69,7 @@ class SignUpForm(UserCreationForm):
 
 
 class EmailAuthenticationForm(forms.Form):
-    email = forms.EmailField(label='Email', max_length=254)
+    email = forms.EmailField(label='Почта', max_length=254)
     password = forms.CharField(label='Пароль', strip=False, widget=forms.PasswordInput)
 
     error_messages = {
@@ -59,6 +81,19 @@ class EmailAuthenticationForm(forms.Form):
         self.request = request
         self.user_cache = None
         super().__init__(*args, **kwargs)
+        self.fields['email'].widget.attrs.update(
+            {
+                'class': 'form-control',
+                'placeholder': 'name@example.com',
+                'autocomplete': 'email',
+            }
+        )
+        self.fields['password'].widget.attrs.update(
+            {
+                'class': 'form-control',
+                'autocomplete': 'current-password',
+            }
+        )
 
     def clean(self):
         email = self.cleaned_data.get('email')
