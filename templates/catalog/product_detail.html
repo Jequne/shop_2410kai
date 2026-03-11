@@ -5,12 +5,36 @@
 {% block content %}
 <div class="row g-4">
     <div class="col-md-6">
-        <div class="product-detail-media-wrap">
+        <div id="product-image-viewer" class="product-detail-media-wrap product-image-viewer">
             {% if product.image %}
-            <img src="{{ product.image.url }}" class="img-fluid rounded-4 shadow-sm product-detail-main-image"
-                alt="{{ product.name }}">
+            <img id="product-detail-main-image" src="{{ product.image.url }}"
+                class="img-fluid rounded-4 shadow-sm product-detail-main-image" alt="{{ product.name }}">
+            <div class="d-none" id="product-gallery-sources">
+                {% for gallery_image in product.gallery_images.all %}
+                {% if gallery_image.image %}
+                <span class="product-gallery-source" data-src="{{ gallery_image.image.url }}"
+                    data-alt="{{ gallery_image.alt_text|default:product.name }}"></span>
+                {% endif %}
+                {% endfor %}
+            </div>
+            {% else %}
+            {% with first_gallery=product.gallery_images.first %}
+            {% if first_gallery %}
+            <img id="product-detail-main-image" src="{{ first_gallery.image.url }}"
+                class="img-fluid rounded-4 shadow-sm product-detail-main-image"
+                alt="{{ first_gallery.alt_text|default:product.name }}">
+            <div class="d-none" id="product-gallery-sources">
+                {% for gallery_image in product.gallery_images.all %}
+                {% if gallery_image.image %}
+                <span class="product-gallery-source" data-src="{{ gallery_image.image.url }}"
+                    data-alt="{{ gallery_image.alt_text|default:product.name }}"></span>
+                {% endif %}
+                {% endfor %}
+            </div>
             {% else %}
             <div class="product-detail-main-image product-thumb-placeholder">Нет фото</div>
+            {% endif %}
+            {% endwith %}
             {% endif %}
         </div>
     </div>
@@ -73,4 +97,88 @@
 {% else %}
 <p class="text-muted mt-3">Авторизуйтесь, чтобы оставлять отзывы.</p>
 {% endif %}
+
+<script>
+    (function () {
+        var viewer = document.getElementById('product-image-viewer');
+        var mainImage = document.getElementById('product-detail-main-image');
+        if (!viewer || !mainImage) {
+            return;
+        }
+
+        var normalizeUrl = function (value) {
+            try {
+                return new URL(value, window.location.href).href;
+            } catch (error) {
+                return value;
+            }
+        };
+
+        var images = [];
+        var addImage = function (src, alt) {
+            if (!src) {
+                return;
+            }
+            var normalized = normalizeUrl(src);
+            for (var i = 0; i < images.length; i++) {
+                if (images[i].src === normalized) {
+                    return;
+                }
+            }
+            images.push({ src: normalized, alt: alt || mainImage.alt || '' });
+        };
+
+        addImage(mainImage.getAttribute('src'), mainImage.getAttribute('alt'));
+
+        var sourceNodes = viewer.querySelectorAll('.product-gallery-source');
+        for (var i = 0; i < sourceNodes.length; i++) {
+            addImage(sourceNodes[i].getAttribute('data-src'), sourceNodes[i].getAttribute('data-alt'));
+        }
+
+        if (images.length < 2) {
+            return;
+        }
+
+        viewer.classList.add('has-gallery');
+
+        var currentIndex = 0;
+        var currentMainSrc = normalizeUrl(mainImage.getAttribute('src'));
+        for (var j = 0; j < images.length; j++) {
+            if (images[j].src === currentMainSrc) {
+                currentIndex = j;
+                break;
+            }
+        }
+
+        var renderImage = function (index) {
+            currentIndex = (index + images.length) % images.length;
+            mainImage.src = images[currentIndex].src;
+            mainImage.alt = images[currentIndex].alt;
+        };
+
+        var updateCursorSide = function (event) {
+            var rect = viewer.getBoundingClientRect();
+            var offsetX = event.clientX - rect.left;
+            var isLeftSide = offsetX < rect.width / 2;
+            viewer.classList.toggle('is-left', isLeftSide);
+            viewer.classList.toggle('is-right', !isLeftSide);
+        };
+
+        viewer.addEventListener('mousemove', updateCursorSide);
+        viewer.addEventListener('mouseleave', function () {
+            viewer.classList.remove('is-left');
+            viewer.classList.remove('is-right');
+        });
+
+        viewer.addEventListener('click', function (event) {
+            var rect = viewer.getBoundingClientRect();
+            var offsetX = event.clientX - rect.left;
+            if (offsetX < rect.width / 2) {
+                renderImage(currentIndex - 1);
+            } else {
+                renderImage(currentIndex + 1);
+            }
+        });
+    })();
+</script>
 {% endblock %}

@@ -403,6 +403,23 @@ body {
     background: #f8fbf6;
 }
 
+.product-image-viewer {
+    position: relative;
+}
+
+.product-image-viewer.has-gallery {
+    cursor: e-resize;
+    user-select: none;
+}
+
+.product-image-viewer.has-gallery.is-left {
+    cursor: w-resize;
+}
+
+.product-image-viewer.has-gallery.is-right {
+    cursor: e-resize;
+}
+
 .product-detail-main-image {
     width: 100%;
     object-fit: cover;
