@@ -36,8 +36,11 @@
                     {% endif %}
                 </ul>
                 <div class="d-flex align-items-center gap-3">
-                    <a class="text-decoration-none" href="{% url 'cart:detail' %}">Корзина <span id="cart-counter">({%
-                            include 'cart/partials/cart_counter.html' %})</span></a>
+                    <a class="text-decoration-none d-flex align-items-center gap-1" href="{% url 'cart:detail' %}">
+                        <span>Корзина</span>
+                        <span id="cart-counter" class="badge text-bg-light border">{% include
+                            'cart/partials/cart_counter.html' %}</span>
+                    </a>
                     {% if request.user.is_authenticated %}
                     <a class="text-decoration-none" href="{% url 'accounts:profile' %}">Профиль</a>
                     <form method="post" action="{% url 'accounts:logout' %}" class="m-0">
@@ -53,7 +56,7 @@
         </div>
     </nav>
 
-    <main class="container py-4">
+    <main class="container py-4 site-main">
         {% if messages %}
         {% for message in messages %}
         <div class="alert alert-{{ message.tags|default:'info' }}">{{ message }}</div>
@@ -62,7 +65,7 @@
         {% block content %}{% endblock %}
     </main>
 
-    <footer class="border-top py-4 mt-4">
+    <footer class="border-top site-footer mt-3">
         <div class="container d-flex flex-column flex-md-row justify-content-between gap-2">
             <span class="text-muted">{{ SHOP_NAME }} © 2026</span>
             <span class="text-muted">Поддержка: {{ SUPPORT_EMAIL }}</span>

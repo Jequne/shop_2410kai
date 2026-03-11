@@ -1,3 +1,5 @@
+import re
+
 from django import forms
 from django.contrib.auth import authenticate
 from django.contrib.auth.forms import UserCreationForm
@@ -79,6 +81,8 @@ class EmailAuthenticationForm(forms.Form):
 
 
 class ProfileForm(forms.ModelForm):
+    phone_pattern = re.compile(r'^\+?[0-9\-\s\(\)]{10,20}$')
+
     class Meta:
         model = Profile
         fields = ('phone', 'address')
@@ -86,3 +90,34 @@ class ProfileForm(forms.ModelForm):
             'phone': 'Телефон',
             'address': 'Адрес',
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['phone'].widget.attrs.update(
+            {
+                'class': 'form-control',
+                'placeholder': '+7 (900) 123-45-67',
+                'autocomplete': 'tel',
+            }
+        )
+        self.fields['address'].widget.attrs.update(
+            {
+                'class': 'form-control',
+                'placeholder': 'Город, улица, дом, квартира',
+                'autocomplete': 'street-address',
+            }
+        )
+
+    def clean_phone(self):
+        phone = (self.cleaned_data.get('phone') or '').strip()
+        if not phone:
+            return phone
+
+        if not self.phone_pattern.fullmatch(phone):
+            raise ValidationError('Введите корректный номер телефона, например +7 (900) 123-45-67.')
+
+        digits = ''.join(ch for ch in phone if ch.isdigit())
+        if len(digits) < 10 or len(digits) > 15:
+            raise ValidationError('Номер телефона должен содержать от 10 до 15 цифр.')
+
+        return phone

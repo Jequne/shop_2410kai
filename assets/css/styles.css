@@ -12,6 +12,18 @@ body {
     background: radial-gradient(circle at top right, #e8f7df 0, var(--bg) 45%);
     color: var(--text);
     font-family: "JetBrains Mono", monospace;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.site-main {
+    flex: 1 0 auto;
+}
+
+.site-footer {
+    padding-top: 0.9rem;
+    padding-bottom: 0.9rem;
 }
 
 .navbar-brand,
@@ -36,6 +48,23 @@ body {
 .card {
     border-radius: 14px;
     border: 1px solid #dde6d8;
+}
+
+.product-card-link {
+    text-decoration: none;
+}
+
+.product-card {
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.product-card-link:hover .product-card {
+    transform: translateY(-3px);
+    box-shadow: 0 0.6rem 1rem rgba(31, 61, 30, 0.14) !important;
+}
+
+.stock-low {
+    color: #c4547c;
 }
 
 .btn-dark {

@@ -14,6 +14,13 @@
         <p class="text-muted">{{ product.category.name|default:'Без категории' }}</p>
         <p>{{ product.description }}</p>
         <p class="h4">{{ product.price }} руб.</p>
+        {% if product.stock_quantity > 0 %}
+        <p class="{% if product.stock_quantity < 10 %}stock-low{% else %}text-success{% endif %}">
+            В наличии: {{ product.stock_quantity }} шт.
+        </p>
+        {% else %}
+        <p class="text-danger">Нет в наличии</p>
+        {% endif %}
         <p>Средняя оценка: {{ product.average_rating }}</p>
 
         {% if request.user.is_authenticated %}

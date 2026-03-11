@@ -13,12 +13,15 @@
     </div>
 </div>
 
-<form class="row g-2 mb-4" hx-get="{% url 'catalog:product_list' %}" hx-target="#products-block" hx-push-url="true">
-    <div class="col-md-4">
-        <input class="form-control" type="text" name="q" value="{{ q }}" placeholder="Поиск по названию или описанию">
+<form id="catalog-filters" class="row g-2 mb-4" action="{% url 'catalog:product_list' %}" method="get">
+    <div class="col-md-5">
+        <input class="form-control" type="text" name="q" value="{{ q }}" placeholder="Поиск по названию или описанию"
+            hx-get="{% url 'catalog:product_list' %}" hx-target="#products-block" hx-include="#catalog-filters"
+            hx-push-url="true" hx-trigger="keyup changed delay:350ms, search">
     </div>
     <div class="col-md-3">
-        <select class="form-select" name="category">
+        <select class="form-select" name="category" hx-get="{% url 'catalog:product_list' %}"
+            hx-target="#products-block" hx-include="#catalog-filters" hx-push-url="true" hx-trigger="change">
             <option value="">Все категории</option>
             {% for category in category_options %}
             <option value="{{ category.slug }}" {{ category.selected_attr }}>
@@ -27,15 +30,13 @@
             {% endfor %}
         </select>
     </div>
-    <div class="col-md-3">
-        <select class="form-select" name="sort">
+    <div class="col-md-4">
+        <select class="form-select" name="sort" hx-get="{% url 'catalog:product_list' %}" hx-target="#products-block"
+            hx-include="#catalog-filters" hx-push-url="true" hx-trigger="change">
             {% for option in sort_options %}
             <option value="{{ option.value }}" {{ option.selected_attr }}>{{ option.label }}</option>
             {% endfor %}
         </select>
-    </div>
-    <div class="col-md-2">
-        <button class="btn btn-dark w-100" type="submit">Найти</button>
     </div>
 </form>
 
