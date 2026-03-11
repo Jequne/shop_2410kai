@@ -3,17 +3,22 @@
 {% block title %}Каталог | {{ SHOP_NAME }}{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-    <h1 class="h3 mb-0">Каталог товаров</h1>
-    <div class="btn-group">
-        <a class="btn btn-sm btn-outline-dark"
-            href="{% url 'core:set_view_mode' 'grid' %}?next={{ request.get_full_path }}">Сетка</a>
-        <a class="btn btn-sm btn-outline-dark"
-            href="{% url 'core:set_view_mode' 'list' %}?next={{ request.get_full_path }}">Список</a>
+<div class="catalog-hero mb-4">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <div>
+            <h1 class="h3 mb-1">Каталог товаров</h1>
+            <p class="text-muted mb-0">Выберите категорию, сортировку и изучайте карточки товаров.</p>
+        </div>
+        <div class="btn-group view-mode-switch">
+            <a class="btn btn-sm {% if view_mode == 'grid' %}btn-dark{% else %}btn-outline-dark{% endif %}"
+                href="{% url 'core:set_view_mode' 'grid' %}?next={{ request.get_full_path }}">Сетка</a>
+            <a class="btn btn-sm {% if view_mode == 'list' %}btn-dark{% else %}btn-outline-dark{% endif %}"
+                href="{% url 'core:set_view_mode' 'list' %}?next={{ request.get_full_path }}">Список</a>
+        </div>
     </div>
 </div>
 
-<form id="catalog-filters" class="row g-2 mb-4" action="{% url 'catalog:product_list' %}" method="get">
+<form id="catalog-filters" class="row g-2 mb-4 catalog-filters" action="{% url 'catalog:product_list' %}" method="get">
     <div class="col-md-5">
         <input class="form-control" type="text" name="q" value="{{ q }}" placeholder="Поиск по названию или описанию"
             hx-get="{% url 'catalog:product_list' %}" hx-target="#products-block" hx-include="#catalog-filters"

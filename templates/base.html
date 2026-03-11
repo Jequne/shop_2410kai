@@ -35,17 +35,64 @@
                     </li>
                     {% endif %}
                 </ul>
-                <div class="d-flex align-items-center gap-3">
+                <div class="header-actions d-flex align-items-center">
                     {% if request.user.is_authenticated %}
-                    <a class="text-decoration-none d-flex align-items-center gap-1" href="{% url 'cart:detail' %}">
-                        <span>Корзина</span>
-                        <span id="cart-counter" class="badge text-bg-light border">{{ cart_items_count }}</span>
-                    </a>
-                    <a class="text-decoration-none" href="{% url 'accounts:profile' %}">Профиль</a>
-                    <form method="post" action="{% url 'accounts:logout' %}" class="m-0">
-                        {% csrf_token %}
-                        <button class="btn btn-sm btn-outline-dark" type="submit">Выход</button>
-                    </form>
+                    <div class="header-action-wrap cart-wrap">
+                        <a class="header-icon-link" href="{% url 'cart:detail' %}" aria-label="Корзина">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path
+                                    d="M7 4h-2l-1 2v2h2l2.2 7.3a2 2 0 0 0 1.9 1.4h7.8a2 2 0 0 0 1.9-1.4l1.3-4.3a1 1 0 0 0-1-1.3h-9.7l-.5-2h11.2v-2h-12l-.4-1.3a1 1 0 0 0-.9-.7zm3.2 14.8a1.6 1.6 0 1 0 0 3.2 1.6 1.6 0 0 0 0-3.2zm7 0a1.6 1.6 0 1 0 0 3.2 1.6 1.6 0 0 0 0-3.2z" />
+                            </svg>
+                            <span id="cart-counter" class="cart-counter-badge">{{ cart_items_count }}</span>
+                        </a>
+
+                        <div class="cart-popover" role="dialog" aria-label="Предпросмотр корзины">
+                            <div class="cart-popover-header">Мой заказ</div>
+                            <div class="cart-popover-body">
+                                {% if cart_preview_items %}
+                                {% for item in cart_preview_items %}
+                                <a href="{% url 'cart:detail' %}" class="cart-preview-item text-reset">
+                                    {% if item.product.image %}
+                                    <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}"
+                                        class="cart-preview-thumb">
+                                    {% else %}
+                                    <div class="cart-preview-thumb cart-preview-thumb-empty">Нет фото</div>
+                                    {% endif %}
+                                    <div class="cart-preview-meta">
+                                        <div class="cart-preview-name">{{ item.product.name }}</div>
+                                        <div class="cart-preview-sub">{{ item.quantity }} шт. x {{ item.product.price }}
+                                            руб.</div>
+                                    </div>
+                                </a>
+                                {% endfor %}
+                                {% else %}
+                                <div class="text-muted small">Ваша корзина пока пуста.</div>
+                                {% endif %}
+                            </div>
+                            <div class="cart-popover-footer">
+                                <div class="cart-popover-total">Итого <strong>{{ cart_preview_total }} руб.</strong>
+                                </div>
+                                <a class="btn btn-dark w-100" href="{% url 'orders:checkout' %}">Оформить заказ</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="header-action-wrap profile-wrap">
+                        <a class="header-icon-link" href="{% url 'accounts:profile' %}" title="Перейти в профиль"
+                            aria-label="Профиль">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path
+                                    d="M12 3.5a4.5 4.5 0 1 0 0 9 4.5 4.5 0 0 0 0-9zM4.5 20a7.5 7.5 0 0 1 15 0h-2a5.5 5.5 0 0 0-11 0h-2z" />
+                            </svg>
+                        </a>
+                        <div class="profile-popover" role="menu" aria-label="Профиль">
+                            <a href="{% url 'accounts:profile' %}" class="profile-popover-link">Перейти в профиль</a>
+                            <form method="post" action="{% url 'accounts:logout' %}" class="m-0">
+                                {% csrf_token %}
+                                <button class="profile-popover-link profile-popover-logout" type="submit">Выйти</button>
+                            </form>
+                        </div>
+                    </div>
                     {% else %}
                     <a class="text-decoration-none" href="{% url 'accounts:login' %}">Вход</a>
                     <a class="btn btn-sm btn-dark" href="{% url 'accounts:signup' %}">Регистрация</a>
