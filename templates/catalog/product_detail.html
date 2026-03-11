@@ -142,6 +142,7 @@
         viewer.classList.add('has-gallery');
 
         var currentIndex = 0;
+        var isAnimating = false;
         var currentMainSrc = normalizeUrl(mainImage.getAttribute('src'));
         for (var j = 0; j < images.length; j++) {
             if (images[j].src === currentMainSrc) {
@@ -151,9 +152,34 @@
         }
 
         var renderImage = function (index) {
+            if (isAnimating) {
+                return;
+            }
+            isAnimating = true;
             currentIndex = (index + images.length) % images.length;
-            mainImage.src = images[currentIndex].src;
-            mainImage.alt = images[currentIndex].alt;
+            var nextImage = images[currentIndex];
+            mainImage.classList.add('is-fading');
+
+            var finishTransition = function () {
+                mainImage.classList.remove('is-fading');
+                isAnimating = false;
+            };
+
+            var onAssetReady = function () {
+                mainImage.removeEventListener('load', onAssetReady);
+                mainImage.removeEventListener('error', onAssetReady);
+                window.requestAnimationFrame(finishTransition);
+            };
+
+            mainImage.addEventListener('load', onAssetReady);
+            mainImage.addEventListener('error', onAssetReady);
+
+            mainImage.src = nextImage.src;
+            mainImage.alt = nextImage.alt;
+
+            if (mainImage.complete) {
+                onAssetReady();
+            }
         };
 
         var updateCursorSide = function (event) {
