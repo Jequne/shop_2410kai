@@ -29,6 +29,20 @@ def _is_cart_table_request(request: HttpRequest) -> bool:
 	return bool(request.htmx and request.headers.get('HX-Target') == 'cart-table-wrap')
 
 
+def _is_product_controls_request(request: HttpRequest) -> bool:
+	return bool(request.htmx and request.headers.get('HX-Target') == 'product-cart-controls')
+
+
+def _render_product_cart_state(request: HttpRequest, user, product: Product) -> HttpResponse:
+	cart = get_or_create_cart(user)
+	cart_item = cart.items.select_related('product').filter(product=product).first()
+	context = {
+		'product': product,
+		'cart_item': cart_item,
+	}
+	return render(request, 'catalog/partials/product_cart_state.html', context)
+
+
 @login_required
 def cart_detail_view(request: HttpRequest) -> HttpResponse:
 	cart = get_or_create_cart(request.user)
@@ -50,6 +64,8 @@ def add_to_cart_view(request: HttpRequest, slug: str) -> HttpResponse:
 		item.refresh_from_db()
 
 	if request.htmx:
+		if _is_product_controls_request(request):
+			return _render_product_cart_state(request, request.user, product)
 		return _render_cart_header_state(request, request.user)
 
 	messages.success(request, f'Товар «{product.name}» добавлен в корзину.')
@@ -75,13 +91,16 @@ def update_cart_item_view(request: HttpRequest, item_id: int) -> HttpResponse:
 
 @login_required
 def remove_cart_item_view(request: HttpRequest, item_id: int) -> HttpResponse:
-	item = get_object_or_404(CartItem.objects.select_related('cart'), id=item_id, cart__user=request.user)
+	item = get_object_or_404(CartItem.objects.select_related('cart', 'product'), id=item_id, cart__user=request.user)
 	cart = item.cart
+	product = item.product
 	item.delete()
 
 	if _is_cart_table_request(request):
 		return render(request, 'cart/partials/cart_items_table.html', {'cart': cart, 'items': cart.items.select_related('product').all()})
 	if request.htmx:
+		if _is_product_controls_request(request):
+			return _render_product_cart_state(request, request.user, product)
 		return _render_cart_header_state(request, request.user)
 
 	return redirect('cart:detail')
@@ -93,10 +112,13 @@ def increase_cart_item_view(request: HttpRequest, item_id: int) -> HttpResponse:
 		return redirect('cart:detail')
 
 	item = get_object_or_404(CartItem.objects.select_related('cart', 'product'), id=item_id, cart__user=request.user)
+	product = item.product
 	item.quantity = F('quantity') + 1
 	item.save(update_fields=['quantity'])
 
 	if request.htmx:
+		if _is_product_controls_request(request):
+			return _render_product_cart_state(request, request.user, product)
 		return _render_cart_header_state(request, request.user)
 
 	return redirect('cart:detail')
@@ -108,6 +130,7 @@ def decrease_cart_item_view(request: HttpRequest, item_id: int) -> HttpResponse:
 		return redirect('cart:detail')
 
 	item = get_object_or_404(CartItem.objects.select_related('cart', 'product'), id=item_id, cart__user=request.user)
+	product = item.product
 	if item.quantity <= 1:
 		item.delete()
 	else:
@@ -115,6 +138,8 @@ def decrease_cart_item_view(request: HttpRequest, item_id: int) -> HttpResponse:
 		item.save(update_fields=['quantity'])
 
 	if request.htmx:
+		if _is_product_controls_request(request):
+			return _render_product_cart_state(request, request.user, product)
 		return _render_cart_header_state(request, request.user)
 
 	return redirect('cart:detail')

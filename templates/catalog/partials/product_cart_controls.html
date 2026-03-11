@@ -1,0 +1,30 @@
+<div id="product-cart-controls" class="d-flex flex-column gap-2">
+    <form method="post" action="{% url 'cart:add' product.slug %}" hx-post="{% url 'cart:add' product.slug %}"
+        hx-target="#product-cart-controls" hx-swap="outerHTML">
+        {% csrf_token %}
+        <button class="btn btn-dark w-100" type="submit">Добавить в корзину</button>
+    </form>
+
+    {% if cart_item %}
+    <div class="product-inline-cart-controls">
+        <form method="post" action="{% url 'cart:decrease_item' cart_item.id %}"
+            hx-post="{% url 'cart:decrease_item' cart_item.id %}" hx-target="#product-cart-controls"
+            hx-swap="outerHTML">
+            {% csrf_token %}
+            <button class="btn btn-outline-dark btn-sm" type="submit">-</button>
+        </form>
+        <span class="product-inline-cart-qty">В корзине: {{ cart_item.quantity }}</span>
+        <form method="post" action="{% url 'cart:increase_item' cart_item.id %}"
+            hx-post="{% url 'cart:increase_item' cart_item.id %}" hx-target="#product-cart-controls"
+            hx-swap="outerHTML">
+            {% csrf_token %}
+            <button class="btn btn-outline-dark btn-sm" type="submit">+</button>
+        </form>
+        <form method="post" action="{% url 'cart:remove_item' cart_item.id %}"
+            hx-post="{% url 'cart:remove_item' cart_item.id %}" hx-target="#product-cart-controls" hx-swap="outerHTML">
+            {% csrf_token %}
+            <button class="btn btn-outline-danger btn-sm" type="submit">Убрать</button>
+        </form>
+    </div>
+    {% endif %}
+</div>
