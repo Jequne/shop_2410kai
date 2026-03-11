@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}Оформление заказа | {{ SHOP_NAME }}{% endblock %}
+
+{% block content %}
+<h1 class="h3 mb-3">Оформление заказа</h1>
+<div class="row g-4">
+    <div class="col-lg-7">
+        <div class="card card-body shadow-sm">
+            <h2 class="h5">Товары</h2>
+            <ul class="list-group mb-3">
+                {% for item in items %}
+                <li class="list-group-item d-flex justify-content-between">
+                    <span>{{ item.product.name }} × {{ item.quantity }}</span>
+                    <span>{{ item.line_total }} руб.</span>
+                </li>
+                {% endfor %}
+            </ul>
+            <p class="fw-bold mb-0">Итого: {{ cart.total_price }} руб.</p>
+        </div>
+    </div>
+    <div class="col-lg-5">
+        <form method="post" class="card card-body shadow-sm">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button class="btn btn-dark" type="submit">Подтвердить заказ</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

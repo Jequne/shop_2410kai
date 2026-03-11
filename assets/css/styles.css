@@ -1,0 +1,64 @@
+﻿@import url("https://fonts.googleapis.com/css2?family=Jersey+15&family=JetBrains+Mono:wght@400;700&display=swap");
+
+:root {
+    --bg: #f2f8ee;
+    --surface: #ffffff;
+    --text: #1d1f1d;
+    --accent: #2ba62b;
+    --accent-dark: #1d7f1d;
+}
+
+body {
+    background: radial-gradient(circle at top right, #e8f7df 0, var(--bg) 45%);
+    color: var(--text);
+    font-family: "JetBrains Mono", monospace;
+}
+
+.navbar-brand,
+.display-5,
+.h1,
+.h2,
+.h3 {
+    font-family: "Jersey 15", sans-serif;
+    letter-spacing: 0.04em;
+}
+
+.hero {
+    background: linear-gradient(135deg, #d6f3c8, #f6fff2);
+    border: 1px solid #d9ebd0;
+}
+
+.product-thumb {
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+}
+
+.card {
+    border-radius: 14px;
+    border: 1px solid #dde6d8;
+}
+
+.btn-dark {
+    background-color: var(--accent-dark);
+    border-color: var(--accent-dark);
+}
+
+.btn-dark:hover {
+    background-color: #156715;
+    border-color: #156715;
+}
+
+.page-link {
+    color: var(--accent-dark);
+}
+
+.page-item.active .page-link {
+    background-color: var(--accent);
+    border-color: var(--accent);
+}
+
+@media (max-width: 768px) {
+    .hero {
+        border-radius: 18px;
+    }
+}

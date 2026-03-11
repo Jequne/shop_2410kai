@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}Панель менеджера | {{ SHOP_NAME }}{% endblock %}
+
+{% block content %}
+<h1 class="h3 mb-3">Управление заказами</h1>
+<div class="table-responsive">
+    <table class="table align-middle">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Пользователь</th>
+                <th>Сумма</th>
+                <th>Статус</th>
+                <th>Обновить</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in orders %}
+            <tr>
+                <td>#{{ order.id }}</td>
+                <td>{{ order.user.username }}</td>
+                <td>{{ order.total_price }} руб.</td>
+                <td id="order-status-{{ order.id }}">{% include 'managerpanel/partials/order_status_cell.html' %}</td>
+                <td>
+                    <form method="post" action="{% url 'managerpanel:update_status' order.id %}"
+                        hx-post="{% url 'managerpanel:update_status' order.id %}"
+                        hx-target="#order-status-{{ order.id }}" hx-swap="innerHTML">
+                        {% csrf_token %}
+                        <select class="form-select form-select-sm" name="status">
+                            {% for value, label in status_choices %}
+                            <option value="{{ value }}" {% if order.status==value %}selected{% endif %}>{{ label }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        <button class="btn btn-sm btn-dark mt-2" type="submit">Сохранить</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

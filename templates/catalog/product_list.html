@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}Каталог | {{ SHOP_NAME }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+    <h1 class="h3 mb-0">Каталог товаров</h1>
+    <div class="btn-group">
+        <a class="btn btn-sm btn-outline-dark"
+            href="{% url 'core:set_view_mode' 'grid' %}?next={{ request.get_full_path }}">Сетка</a>
+        <a class="btn btn-sm btn-outline-dark"
+            href="{% url 'core:set_view_mode' 'list' %}?next={{ request.get_full_path }}">Список</a>
+    </div>
+</div>
+
+<form class="row g-2 mb-4" hx-get="{% url 'catalog:product_list' %}" hx-target="#products-block" hx-push-url="true">
+    <div class="col-md-4">
+        <input class="form-control" type="text" name="q" value="{{ q }}" placeholder="Поиск по названию или описанию">
+    </div>
+    <div class="col-md-3">
+        <select class="form-select" name="category">
+            <option value="">Все категории</option>
+            {% for category in shop_categories %}
+            <option value="{{ category.slug }}" {% if selected_category==category.slug %}selected{% endif %}>{{
+                category.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-md-3">
+        <select class="form-select" name="sort">
+            <option value="new" {% if sort=='new' %}selected{% endif %}>Сначала новые</option>
+            <option value="price" {% if sort=='price' %}selected{% endif %}>Сначала дешевле</option>
+            <option value="-price" {% if sort=='-price' %}selected{% endif %}>Сначала дороже</option>
+        </select>
+    </div>
+    <div class="col-md-2">
+        <button class="btn btn-dark w-100" type="submit">Найти</button>
+    </div>
+</form>
+
+<div id="products-block">
+    {% include 'catalog/partials/product_list_block.html' %}
+</div>
+{% endblock %}

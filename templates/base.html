@@ -1,0 +1,72 @@
+{% load static %}
+<!doctype html>
+<html lang="ru">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}{{ SHOP_NAME }}{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+</head>
+
+<body>
+    {% if not banner_closed %}
+    <div class="alert alert-success py-2 mb-0 rounded-0 text-center">
+        Бесплатная доставка по РФ при заказе от 5000 руб.
+        <a class="ms-2" href="{% url 'core:close_banner' %}?next={{ request.path }}">Скрыть</a>
+    </div>
+    {% endif %}
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="{% url 'core:landing' %}">{{ SHOP_NAME }}</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="mainNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item"><a class="nav-link" href="{% url 'catalog:product_list' %}">Каталог</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'core:about' %}">О нас</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'core:terms' %}">Условия</a></li>
+                    {% if is_manager_or_admin %}
+                    <li class="nav-item"><a class="nav-link" href="{% url 'managerpanel:orders' %}">Заказы менеджера</a>
+                    </li>
+                    {% endif %}
+                </ul>
+                <div class="d-flex align-items-center gap-3">
+                    <a class="text-decoration-none" href="{% url 'cart:detail' %}">Корзина <span id="cart-counter">({%
+                            include 'cart/partials/cart_counter.html' %})</span></a>
+                    {% if request.user.is_authenticated %}
+                    <a class="text-decoration-none" href="{% url 'accounts:profile' %}">Профиль</a>
+                    <a class="btn btn-sm btn-outline-dark" href="{% url 'accounts:logout' %}">Выход</a>
+                    {% else %}
+                    <a class="text-decoration-none" href="{% url 'accounts:login' %}">Вход</a>
+                    <a class="btn btn-sm btn-dark" href="{% url 'accounts:signup' %}">Регистрация</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container py-4">
+        {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags|default:'info' }}">{{ message }}</div>
+        {% endfor %}
+        {% endif %}
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="border-top py-4 mt-4">
+        <div class="container d-flex flex-column flex-md-row justify-content-between gap-2">
+            <span class="text-muted">{{ SHOP_NAME }} © 2026</span>
+            <span class="text-muted">Поддержка: {{ SUPPORT_EMAIL }}</span>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

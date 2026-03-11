@@ -1,0 +1,41 @@
+{% if items %}
+<div class="table-responsive">
+    <table class="table align-middle">
+        <thead>
+            <tr>
+                <th>Товар</th>
+                <th>Цена</th>
+                <th style="width: 160px;">Количество</th>
+                <th>Сумма</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in items %}
+            <tr>
+                <td>{{ item.product.name }}</td>
+                <td>{{ item.product.price }} руб.</td>
+                <td>
+                    <form method="post" action="{% url 'cart:update_item' item.id %}"
+                        hx-post="{% url 'cart:update_item' item.id %}" hx-target="#cart-table-wrap" hx-swap="innerHTML">
+                        {% csrf_token %}
+                        <input class="form-control" type="number" min="1" name="quantity" value="{{ item.quantity }}">
+                    </form>
+                </td>
+                <td>{{ item.line_total }} руб.</td>
+                <td>
+                    <form method="post" action="{% url 'cart:remove_item' item.id %}"
+                        hx-post="{% url 'cart:remove_item' item.id %}" hx-target="#cart-table-wrap" hx-swap="innerHTML">
+                        {% csrf_token %}
+                        <button class="btn btn-sm btn-outline-danger" type="submit">Удалить</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<p class="fw-bold">Итого: {{ cart.total_price }} руб.</p>
+{% else %}
+<p class="text-muted">Ваша корзина пока пуста.</p>
+{% endif %}

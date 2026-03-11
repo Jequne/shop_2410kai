@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ product.name }} | {{ SHOP_NAME }}{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <div class="col-md-6">
+        {% if product.image %}
+        <img src="{{ product.image.url }}" class="img-fluid rounded-4 shadow-sm" alt="{{ product.name }}">
+        {% endif %}
+    </div>
+    <div class="col-md-6">
+        <h1 class="h2">{{ product.name }}</h1>
+        <p class="text-muted">{{ product.category.name|default:'Без категории' }}</p>
+        <p>{{ product.description }}</p>
+        <p class="h4">{{ product.price }} руб.</p>
+        <p>Средняя оценка: {{ product.average_rating }}</p>
+
+        {% if request.user.is_authenticated %}
+        <form method="post" action="{% url 'cart:add' product.slug %}" hx-post="{% url 'cart:add' product.slug %}"
+            hx-target="#cart-counter" hx-swap="innerHTML">
+            {% csrf_token %}
+            <button class="btn btn-dark" type="submit">Добавить в корзину</button>
+        </form>
+        {% else %}
+        <a class="btn btn-dark" href="{% url 'accounts:login' %}">Войдите, чтобы добавить в корзину</a>
+        {% endif %}
+    </div>
+</div>
+
+<hr class="my-4">
+<h2 class="h4">Отзывы</h2>
+
+<div id="reviews-list">
+    {% include 'catalog/partials/reviews_list.html' %}
+</div>
+
+{% if can_review %}
+<div class="card card-body mt-3 shadow-sm">
+    <h3 class="h5">Оставить отзыв</h3>
+    <form method="post" action="{% url 'catalog:add_review' product.slug %}"
+        hx-post="{% url 'catalog:add_review' product.slug %}" hx-target="#reviews-list" hx-swap="innerHTML">
+        {% csrf_token %}
+        {{ review_form.as_p }}
+        <button class="btn btn-dark" type="submit">Отправить</button>
+    </form>
+</div>
+{% elif request.user.is_authenticated %}
+<p class="text-muted mt-3">Отзыв доступен только после покупки и доставки товара.</p>
+{% else %}
+<p class="text-muted mt-3">Авторизуйтесь, чтобы оставлять отзывы.</p>
+{% endif %}
+{% endblock %}

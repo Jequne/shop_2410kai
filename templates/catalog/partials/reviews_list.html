@@ -1,0 +1,15 @@
+{% if reviews %}
+<div class="d-grid gap-3">
+    {% for review in reviews %}
+    <div class="border rounded-3 p-3">
+        <div class="d-flex justify-content-between">
+            <strong>{{ review.author.username }}</strong>
+            <span>Оценка: {{ review.rating }}/5</span>
+        </div>
+        <p class="mb-0 mt-2">{{ review.text }}</p>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<p class="text-muted">Отзывов пока нет.</p>
+{% endif %}

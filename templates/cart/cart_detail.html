@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block title %}Корзина | {{ SHOP_NAME }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-0">Корзина</h1>
+    <a class="btn btn-dark" href="{% url 'orders:checkout' %}">Оформить заказ</a>
+</div>
+<div id="cart-table-wrap">
+    {% include 'cart/partials/cart_items_table.html' %}
+</div>
+{% endblock %}

@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block title %}Главная | {{ SHOP_NAME }}{% endblock %}
+
+{% block content %}
+<section class="hero p-4 p-md-5 rounded-4 mb-4">
+    <h1 class="display-5 fw-bold">Добро пожаловать в {{ SHOP_NAME }}</h1>
+    <p class="lead mb-4">Онлайн-магазин с удобной корзиной, быстрым checkout и отзывами после покупки.</p>
+    <div class="d-flex gap-2">
+        <a class="btn btn-dark" href="{% url 'catalog:product_list' %}">Перейти в каталог</a>
+        {% if not request.user.is_authenticated %}
+        <a class="btn btn-outline-dark" href="{% url 'accounts:signup' %}">Создать аккаунт</a>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block title %}Заказ #{{ order.id }} | {{ SHOP_NAME }}{% endblock %}
+
+{% block content %}
+<h1 class="h3">Заказ #{{ order.id }}</h1>
+<p>Статус: <strong>{{ order.get_status_display }}</strong></p>
+<p>Сумма: <strong>{{ order.total_price }} руб.</strong></p>
+
+<h2 class="h5 mt-4">Состав заказа</h2>
+<ul class="list-group mb-4">
+    {% for item in order.items.all %}
+    <li class="list-group-item d-flex justify-content-between">
+        <span>{{ item.product.name }} × {{ item.quantity }}</span>
+        <span>{{ item.price_at_purchase }} руб.</span>
+    </li>
+    {% endfor %}
+</ul>
+
+<h2 class="h5">Чек</h2>
+{% if order.receipt and not order.receipt.deleted_at %}
+<pre class="p-3 bg-light border rounded-3">{{ order.receipt.content }}</pre>
+<form method="post" action="{% url 'orders:delete_receipt' order.id %}">
+    {% csrf_token %}
+    <button class="btn btn-outline-danger" type="submit" {% if not order.receipt.can_be_deleted_by_user %}disabled{%
+        endif %}>Удалить чек</button>
+</form>
+{% if not order.receipt.can_be_deleted_by_user %}
+<p class="text-muted mt-2">Удаление будет доступно через 5 дней после создания чека.</p>
+{% endif %}
+{% else %}
+<p class="text-muted">Чек удален пользователем.</p>
+{% endif %}
+{% endblock %}
