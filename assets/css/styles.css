@@ -441,6 +441,37 @@ body {
     font-size: 0.88rem;
 }
 
+.product-cart-htmx-form button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+}
+
+.htmx-inline-spinner {
+    width: 0.82rem;
+    height: 0.82rem;
+    border: 2px solid rgba(52, 79, 56, 0.24);
+    border-top-color: currentColor;
+    border-radius: 50%;
+    display: none;
+    animation: product-cart-spin 0.6s linear infinite;
+}
+
+.product-cart-htmx-form.htmx-request .htmx-inline-spinner {
+    display: inline-block;
+}
+
+.product-cart-htmx-form.htmx-request .btn-label {
+    opacity: 0.78;
+}
+
+@keyframes product-cart-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
 .review-form-panel {
     border-color: #d8e6d0;
     background: linear-gradient(180deg, #f9fdf6, #f0f7eb);
