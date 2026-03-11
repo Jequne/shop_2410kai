@@ -20,8 +20,8 @@
     <div class="col-md-3">
         <select class="form-select" name="category">
             <option value="">Все категории</option>
-            {% for category in shop_categories %}
-            <option value="{{ category.slug }}" {% if selected_category==category.slug %}selected{% endif %}>
+            {% for category in category_options %}
+            <option value="{{ category.slug }}" {{ category.selected_attr }}>
                 {{ category.name }}
             </option>
             {% endfor %}
@@ -29,9 +29,9 @@
     </div>
     <div class="col-md-3">
         <select class="form-select" name="sort">
-            <option value="new" {% if sort=='new' %}selected{% endif %}>Сначала новые</option>
-            <option value="price" {% if sort=='price' %}selected{% endif %}>Сначала дешевле</option>
-            <option value="-price" {% if sort=='-price' %}selected{% endif %}>Сначала дороже</option>
+            {% for option in sort_options %}
+            <option value="{{ option.value }}" {{ option.selected_attr }}>{{ option.label }}</option>
+            {% endfor %}
         </select>
     </div>
     <div class="col-md-2">

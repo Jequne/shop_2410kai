@@ -7,7 +7,7 @@ from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 
 from catalog.forms import ProductReviewForm
-from catalog.models import Product
+from catalog.models import Category, Product
 from orders.models import OrderItem
 
 
@@ -28,6 +28,11 @@ def product_list_view(request: HttpRequest) -> HttpResponse:
 	category_slug = request.GET.get('category', '').strip()
 	sort = request.GET.get('sort', 'new')
 
+	categories = cache.get('active_categories')
+	if categories is None:
+		categories = list(Category.objects.filter(is_active=True).only('name', 'slug'))
+		cache.set('active_categories', categories, 60)
+
 	products = Product.objects.filter(is_active=True).select_related('category')
 	if q:
 		products = products.filter(Q(name__icontains=q) | Q(description__icontains=q))
@@ -44,11 +49,28 @@ def product_list_view(request: HttpRequest) -> HttpResponse:
 	paginator = Paginator(products, 8)
 	page_obj = paginator.get_page(request.GET.get('page', 1))
 
+	category_options = [
+		{
+			'slug': category.slug,
+			'name': category.name,
+			'selected_attr': 'selected' if category.slug == category_slug else '',
+		}
+		for category in categories
+	]
+
+	sort_options = [
+		{'value': 'new', 'label': 'Сначала новые', 'selected_attr': 'selected' if sort == 'new' else ''},
+		{'value': 'price', 'label': 'Сначала дешевле', 'selected_attr': 'selected' if sort == 'price' else ''},
+		{'value': '-price', 'label': 'Сначала дороже', 'selected_attr': 'selected' if sort == '-price' else ''},
+	]
+
 	context = {
 		'page_obj': page_obj,
 		'q': q,
 		'sort': sort,
 		'selected_category': category_slug,
+		'category_options': category_options,
+		'sort_options': sort_options,
 	}
 
 	if request.htmx:
