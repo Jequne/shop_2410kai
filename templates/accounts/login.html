@@ -8,6 +8,9 @@
         <h1 class="h3 mb-3">Вход</h1>
         <form method="post" class="card card-body shadow-sm">
             {% csrf_token %}
+            {% if next %}
+            <input type="hidden" name="next" value="{{ next }}">
+            {% endif %}
             {{ form.as_p }}
             <button class="btn btn-dark" type="submit">Войти</button>
         </form>

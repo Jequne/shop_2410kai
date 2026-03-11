@@ -134,6 +134,7 @@ MEDIA_ROOT = BASE_DIR / 'media'
 LOGIN_URL = 'accounts:login'
 LOGIN_REDIRECT_URL = 'catalog:product_list'
 LOGOUT_REDIRECT_URL = 'core:landing'
+AUTHENTICATION_BACKENDS = ['accounts.auth_backends.EmailOrUsernameBackend']
 
 SHOP_NAME = 'PLOHOY SHOP'
 SUPPORT_EMAIL = 'support@plohoy.shop'
