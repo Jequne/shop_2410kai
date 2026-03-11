@@ -33,7 +33,7 @@ def product_list_view(request: HttpRequest) -> HttpResponse:
 		categories = list(Category.objects.filter(is_active=True).only('name', 'slug'))
 		cache.set('active_categories', categories, 60)
 
-	products = Product.objects.filter(is_active=True).select_related('category')
+	products = Product.objects.filter(is_active=True).select_related('category').prefetch_related('gallery_images')
 	if q:
 		products = products.filter(Q(name__icontains=q) | Q(description__icontains=q))
 	if category_slug:
@@ -82,7 +82,11 @@ def product_detail_view(request: HttpRequest, slug: str) -> HttpResponse:
 	cache_key = f'product_detail_{slug}'
 	product = cache.get(cache_key)
 	if not product:
-		product = get_object_or_404(Product.objects.select_related('category'), slug=slug, is_active=True)
+		product = get_object_or_404(
+			Product.objects.select_related('category').prefetch_related('gallery_images'),
+			slug=slug,
+			is_active=True,
+		)
 		cache.set(cache_key, product, 60)
 
 	reviews = product.reviews.select_related('author').all()

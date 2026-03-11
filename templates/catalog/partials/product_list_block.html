@@ -3,13 +3,35 @@
     <div class="col-sm-6 col-lg-3">
         <a href="{% url 'catalog:product_detail' product.slug %}" class="product-card-link text-reset d-block h-100">
             <div class="card h-100 shadow-sm product-card">
-                {% if product.image %}
-                <img src="{{ product.image.url }}" class="card-img-top product-thumb" alt="{{ product.name }}">
-                {% endif %}
-                <div class="card-body d-flex flex-column">
-                    <h2 class="h6">{{ product.name }}</h2>
-                    <p class="text-muted small mb-2">{{ product.category.name|default:'Без категории' }}</p>
-                    <p class="mb-0">{{ product.price }} руб.</p>
+                {% with hover_image=product.gallery_images.all|first %}
+                <div class="product-media">
+                    {% if product.image %}
+                    <img src="{{ product.image.url }}" class="card-img-top product-thumb product-thumb-main"
+                        alt="{{ product.name }}">
+                    {% else %}
+                    <div class="card-img-top product-thumb product-thumb-placeholder">Нет фото</div>
+                    {% endif %}
+
+                    {% if hover_image %}
+                    <img src="{{ hover_image.image.url }}" class="card-img-top product-thumb product-thumb-hover"
+                        alt="{{ hover_image.alt_text|default:product.name }}">
+                    {% endif %}
+
+                    {% if product.stock_quantity > 0 %}
+                    <div
+                        class="product-stock-overlay {% if product.stock_quantity < 10 %}product-stock-overlay-low{% endif %}">
+                        В наличии {{ product.stock_quantity }} шт.
+                    </div>
+                    {% else %}
+                    <div class="product-stock-overlay product-stock-overlay-empty">Нет в наличии</div>
+                    {% endif %}
+                </div>
+                {% endwith %}
+
+                <div class="card-body product-card-body">
+                    <h2 class="product-card-title">{{ product.name }}</h2>
+                    <p class="product-card-category">{{ product.category.name|default:'Без категории' }}</p>
+                    <p class="product-card-price">{{ product.price }} руб.</p>
                 </div>
             </div>
         </a>

@@ -51,6 +51,22 @@ class Product(models.Model):
 		return round(value or 0, 2)
 
 
+class ProductImage(models.Model):
+	product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='gallery_images', verbose_name='Товар')
+	image = models.ImageField('Изображение', upload_to='products/gallery/')
+	alt_text = models.CharField('Alt-текст', max_length=150, blank=True)
+	position = models.PositiveSmallIntegerField('Позиция', default=0)
+	created_at = models.DateTimeField(auto_now_add=True)
+
+	class Meta:
+		verbose_name = 'Дополнительное изображение товара'
+		verbose_name_plural = 'Дополнительные изображения товаров'
+		ordering = ['position', 'id']
+
+	def __str__(self) -> str:
+		return f'Изображение для {self.product.name}'
+
+
 class ProductReview(models.Model):
 	product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='reviews', verbose_name='Товар')
 	author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='reviews', verbose_name='Автор')
