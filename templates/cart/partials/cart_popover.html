@@ -1,0 +1,44 @@
+<div id="cart-popover" class="cart-popover" role="dialog" aria-label="Предпросмотр корзины" {% if hx_oob
+    %}hx-swap-oob="true" {% endif %}>
+    <div class="cart-popover-header">Мой заказ</div>
+    <div class="cart-popover-body">
+        {% if cart_preview_items %}
+        {% for item in cart_preview_items %}
+        <div class="cart-preview-item">
+            <a href="{% url 'cart:detail' %}" class="text-reset text-decoration-none d-flex gap-2 flex-grow-1 min-w-0">
+                {% if item.product.image %}
+                <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="cart-preview-thumb">
+                {% else %}
+                <div class="cart-preview-thumb cart-preview-thumb-empty">Нет фото</div>
+                {% endif %}
+                <div class="cart-preview-meta">
+                    <div class="cart-preview-name">{{ item.product.name }}</div>
+                    <div class="cart-preview-sub">{{ item.product.price }} руб.</div>
+                </div>
+            </a>
+            <div class="cart-preview-actions">
+                <form method="post" action="{% url 'cart:decrease_item' item.id %}">
+                    {% csrf_token %}
+                    <button class="cart-preview-action-btn" type="submit"
+                        hx-post="{% url 'cart:decrease_item' item.id %}" hx-swap="none"
+                        aria-label="Уменьшить">-</button>
+                </form>
+                <span class="cart-preview-qty">{{ item.quantity }}</span>
+                <form method="post" action="{% url 'cart:increase_item' item.id %}">
+                    {% csrf_token %}
+                    <button class="cart-preview-action-btn" type="submit"
+                        hx-post="{% url 'cart:increase_item' item.id %}" hx-swap="none"
+                        aria-label="Увеличить">+</button>
+                </form>
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="text-muted small">Ваша корзина пока пуста.</div>
+        {% endif %}
+    </div>
+    <div class="cart-popover-footer">
+        <div class="cart-popover-total">Итого <strong>{{ cart_preview_total }} руб.</strong></div>
+        <a class="btn btn-dark w-100" href="{% url 'orders:checkout' %}">Оформить заказ</a>
+    </div>
+</div>

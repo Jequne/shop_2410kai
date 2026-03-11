@@ -45,36 +45,7 @@
                             </svg>
                             <span id="cart-counter" class="cart-counter-badge">{{ cart_items_count }}</span>
                         </a>
-
-                        <div class="cart-popover" role="dialog" aria-label="Предпросмотр корзины">
-                            <div class="cart-popover-header">Мой заказ</div>
-                            <div class="cart-popover-body">
-                                {% if cart_preview_items %}
-                                {% for item in cart_preview_items %}
-                                <a href="{% url 'cart:detail' %}" class="cart-preview-item text-reset">
-                                    {% if item.product.image %}
-                                    <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}"
-                                        class="cart-preview-thumb">
-                                    {% else %}
-                                    <div class="cart-preview-thumb cart-preview-thumb-empty">Нет фото</div>
-                                    {% endif %}
-                                    <div class="cart-preview-meta">
-                                        <div class="cart-preview-name">{{ item.product.name }}</div>
-                                        <div class="cart-preview-sub">{{ item.quantity }} шт. x {{ item.product.price }}
-                                            руб.</div>
-                                    </div>
-                                </a>
-                                {% endfor %}
-                                {% else %}
-                                <div class="text-muted small">Ваша корзина пока пуста.</div>
-                                {% endif %}
-                            </div>
-                            <div class="cart-popover-footer">
-                                <div class="cart-popover-total">Итого <strong>{{ cart_preview_total }} руб.</strong>
-                                </div>
-                                <a class="btn btn-dark w-100" href="{% url 'orders:checkout' %}">Оформить заказ</a>
-                            </div>
-                        </div>
+                        {% include 'cart/partials/cart_popover.html' %}
                     </div>
 
                     <div class="header-action-wrap profile-wrap">

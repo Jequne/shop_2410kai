@@ -120,14 +120,20 @@ body {
 
 .cart-preview-item {
     display: flex;
+    align-items: center;
+    justify-content: space-between;
     gap: 0.65rem;
     padding: 0.45rem;
     border-radius: 10px;
-    text-decoration: none;
+    transition: background-color 0.25s ease;
 }
 
 .cart-preview-item:hover {
     background: #eef6e9;
+}
+
+.cart-preview-item .d-flex {
+    min-width: 0;
 }
 
 .cart-preview-thumb {
@@ -159,6 +165,38 @@ body {
 .cart-preview-sub {
     color: #667067;
     font-size: 0.76rem;
+}
+
+.cart-preview-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.cart-preview-qty {
+    min-width: 1.1rem;
+    text-align: center;
+    font-size: 0.83rem;
+}
+
+.cart-preview-action-btn {
+    width: 1.25rem;
+    height: 1.25rem;
+    border-radius: 999px;
+    border: 1px solid #b6c8ab;
+    background: #f5fbf0;
+    color: #1e3e2c;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    padding: 0;
+    transition: transform 0.25s ease, background-color 0.25s ease;
+}
+
+.cart-preview-action-btn:hover {
+    transform: translateY(-1px);
+    background: #e6f3dc;
 }
 
 .cart-popover-total {
